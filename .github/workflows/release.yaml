@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build_wheel.yaml
+    secrets: inherit
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wheel
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.9.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}

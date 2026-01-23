@@ -1,0 +1,67 @@
+name: Build wheels
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: cibuildwheel (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel
+
+      - name: Build wheels
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_SKIP: "pp* *-win*"
+          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          BISON_BUILD_PARALLEL: "4"
+          BISON_BIN_STRIP: "1"
+          BISON_VERSION: "${{ env.BISON_VERSION }}"
+          BISON_BIN_VERSION: "${{ env.BISON_BIN_VERSION }}"
+          M4_VERSION: "${{ env.M4_VERSION }}"
+        run: |
+          python -m cibuildwheel --output-dir wheelhouse
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: wheelhouse
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.9.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}

@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bison-bin"
+description = "Prebuilt GNU Bison packaged as a Python wheel"
+version = "0.0.0"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Maintainers" }]
+requires-python = ">=3.8"
+keywords = ["bison", "parser", "toolchain", "compiler"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Code Generators",
+]
+dependencies = []
+
+[tool.cibuildwheel]
+build = ["cp38-*", "cp39-*", "cp310-*", "cp311-*", "cp312-*"]
+skip = ["pp*", "*-win*"]
+test-command = "bison --version"
+environment-pass = ["BISON_VERSION", "M4_VERSION", "BISON_BIN_VERSION"]
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64", "aarch64"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
+[tool.cibuildwheel.environment]
+BISON_BUILD_PARALLEL = "4"
+BISON_BIN_STRIP = "1"

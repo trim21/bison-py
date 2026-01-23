@@ -1,0 +1,10 @@
+name: Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build_wheel.yaml
+    secrets: inherit
