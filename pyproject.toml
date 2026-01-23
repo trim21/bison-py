@@ -1,0 +1,46 @@
+[build-system]
+requires = ["pdm-backend", "requests"]
+build-backend = "pdm.backend"
+
+[project]
+name = "bison-bin"
+description = "Prebuilt GNU Bison packaged as a Python wheel"
+version = "3.8.2.0"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Maintainers" }]
+requires-python = ">=3.9"
+keywords = ["bison", "parser", "toolchain", "compiler"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Code Generators",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/trim21/bison-py"
+Source = "https://github.com/trim21/bison-py"
+Issues = "https://github.com/trim21/bison-py/issues"
+
+[tool.pdm.build]
+package-dir = "src"
+is-purelib = false
+includes = ["src/bison_bin", "${BUILD_DIR}/bison_bin/_payload"]
+excludes = ["build/", "dist/", "wheelhouse/", ".gitignore"]
+
+[project.scripts]
+bison = "bison_bin._wrapper:main_bison"
+yacc = "bison_bin._wrapper:main_yacc"
+
+[tool.cibuildwheel]
+# build = "cp312*"
+build-frontend = "build[uv]"
+test-command = "bison --version"
+
+[tool.cibuildwheel.macos]
+environment = { MACOSX_DEPLOYMENT_TARGET = "14.0" }
