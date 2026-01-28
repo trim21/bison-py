@@ -30,7 +30,7 @@ Issues = "https://github.com/trim21/bison-py/issues"
 [tool.pdm.build]
 package-dir = "src"
 is-purelib = false
-includes = ["src/bison_bin", "${BUILD_DIR}/bison_bin/_payload"]
+includes = ["src/bison_bin"]
 excludes = ["build/", "dist/", "wheelhouse/", ".gitignore"]
 
 [project.scripts]
