@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import shlex
 import shutil
@@ -90,7 +88,10 @@ def _resolve_tarball(downloads: Path) -> Path:
 
 
 def build_bison(
-    stage_root: Path, install_prefix: Path, *, archive: Path | None = None
+    stage_root: Path,
+    install_prefix: Path,
+    *,
+    archive: "Path | None" = None,
 ) -> Path:
     env = os.environ.copy()
 
