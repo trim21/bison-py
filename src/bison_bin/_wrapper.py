@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import sys
 from pathlib import Path
@@ -7,7 +5,7 @@ from pathlib import Path
 from . import get_binary_path, get_yacc_path
 
 
-def _exec(binary: Path, argv: list[str]) -> None:
+def _exec(binary: Path, argv: "list[str]") -> None:
     # Replace current process with the packaged binary to preserve signals/exit codes.
     os.execve(str(binary), [binary.name, *argv], os.environ.copy())
 
