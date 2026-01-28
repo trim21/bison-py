@@ -39,7 +39,7 @@ def _extract(archive: Path, target: Path) -> Path:
     return target
 
 
-def _run(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> None:
+def _run(cmd: list[str], *, cwd: Path, env: "dict[str, str]") -> None:
     print("run: ", shlex.join(cmd))
     subprocess.check_call(cmd, cwd=str(cwd), env=env)
 
@@ -50,8 +50,8 @@ def _build_tar_project(
     archive: Path,
     workdir: Path,
     prefix: Path,
-    env: dict[str, str],
-    extra_config: Optional[list[str]] = None,
+    env: "dict[str, str]",
+    extra_config: "Optional[list[str]]" = None,
 ) -> None:
     src_root = _extract(archive, workdir)
     configure = src_root / "configure"
