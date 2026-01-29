@@ -107,7 +107,8 @@ def build_bison(
 
     env = env.copy()
 
-    env["CC"] = "zig cc -target x86_64-linux-musl"
+    if sys.platform == "linux":
+        env["CC"] = "zig cc -target x86_64-linux-musl"
 
     archive_path = archive or _resolve_tarball(downloads)
 
