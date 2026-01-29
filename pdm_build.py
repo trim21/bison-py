@@ -19,6 +19,16 @@ BISON_URL = f"https://ftp.gnu.org/gnu/bison/{BISON_TARBALL}"
 VENDORED_TARBALL = SRC_ROOT / "bison_bin" / "_sources" / BISON_TARBALL
 CACHE_TARBALL_DIRNAME = "bison-source-cache"
 
+machine = platform.machine().lower()
+if machine in {"x86_64", "amd64"}:
+    arch = "x64"
+elif machine in {"aarch64", "arm64"}:
+    arch = "aarch64"
+elif machine in {"i386", "i486", "i586", "i686", "x86"}:
+    arch = "x86"
+else:
+    raise Exception("unsupported arch {}".format(machine))
+
 
 def _download(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -108,7 +118,14 @@ def build_bison(
     env = env.copy()
 
     if sys.platform == "linux":
-        env["CC"] = "zig cc -target x86_64-linux-musl"
+        if arch == "x64":
+            env["CC"] = "zig cc -target x86_64-linux-musl"
+        elif arch == "aarch64":
+            env["CC"] = "zig cc -target aarch64-linux-musl"
+        elif arch == "x86":
+            env["CC"] = "zig cc -target x86-linux-musl"
+        else:
+            raise Exception(f"unknown arch {platform.machine()}")
 
     archive_path = archive or _resolve_tarball(downloads)
 
@@ -131,27 +148,16 @@ def _default_linux_plat_name() -> "str | None":
     if not sys.platform.startswith("linux"):
         return None
 
-    machine = platform.machine().lower()
-    if machine in {"x86_64", "amd64"}:
-        arch = "x86_64"
-    elif machine in {"aarch64", "arm64"}:
-        arch = "aarch64"
-    elif machine in {"i386", "i486", "i586", "i686", "x86"}:
-        arch = "x86"
-    else:
-        raise RuntimeError(f"Unsupported Linux architecture: {machine}")
-
     plats = {
-        "x86_64-linux": "manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64",
-        "aarch64-linux": "manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64",
-        "x86-linux": "manylinux_2_12_i686.manylinux2010_i686.musllinux_1_1_i686",
+        "x64": "manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64",
+        "aarch64": "manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64",
+        "x86": "manylinux_2_12_i686.manylinux2010_i686.musllinux_1_1_i686",
     }
 
-    key = f"{arch}-linux"
     try:
-        return plats[key]
-    except KeyError as e:
-        raise RuntimeError(f"No plat-name mapping for {key}") from e
+        return plats[arch]
+    except KeyError:
+        raise RuntimeError(f"No plat-name mapping for {arch}") from None
 
 
 def pdm_build_hook_enabled(context: Context):
