@@ -1,10 +1,12 @@
 import os
+import platform
 import shlex
 import shutil
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from pdm.backend.hooks import Context
 import requests
@@ -105,6 +107,8 @@ def build_bison(
 
     env = env.copy()
 
+    env["CC"] = "zig cc -target x86_64-linux-musl"
+
     archive_path = archive or _resolve_tarball(downloads)
 
     _build_tar_project(
@@ -122,6 +126,33 @@ def build_bison(
     return install_prefix
 
 
+def _default_linux_plat_name() -> "str | None":
+    if not sys.platform.startswith("linux"):
+        return None
+
+    machine = platform.machine().lower()
+    if machine in {"x86_64", "amd64"}:
+        arch = "x86_64"
+    elif machine in {"aarch64", "arm64"}:
+        arch = "aarch64"
+    elif machine in {"i386", "i486", "i586", "i686", "x86"}:
+        arch = "x86"
+    else:
+        raise RuntimeError(f"Unsupported Linux architecture: {machine}")
+
+    plats = {
+        "x86_64-linux": "manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64",
+        "aarch64-linux": "manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64",
+        "x86-linux": "manylinux_2_12_i686.manylinux2010_i686.musllinux_1_1_i686",
+    }
+
+    key = f"{arch}-linux"
+    try:
+        return plats[key]
+    except KeyError as e:
+        raise RuntimeError(f"No plat-name mapping for {key}") from e
+
+
 def pdm_build_hook_enabled(context: Context):
     return True
 
@@ -131,11 +162,22 @@ def pdm_build_initialize(context: Context) -> None:
         _ensure_vendored_tarball()
         return
 
-    context.builder.config_settings = {
+    config_settings: "dict[str, Any]" = {
         "--python-tag": "py3",
         "--py-limited-api": "none",
         **context.builder.config_settings,
     }
+
+    linux_plat_name = _default_linux_plat_name()
+    if linux_plat_name is not None:
+        config_settings["--plat-name"] = linux_plat_name
+
+    context.builder.config_settings = config_settings
+
+    try:
+        shutil.rmtree(context.build_dir)
+    except FileNotFoundError:
+        pass
 
     context.ensure_build_dir()
     stage_root = Path(context.build_dir) / "bison-stage"
@@ -163,14 +205,4 @@ def pdm_build_initialize(context: Context) -> None:
 
 
 def pdm_build_finalize(context: Context, artifact: Path) -> None:
-    payload_root = Path(context.build_dir) / "bison_bin"
-    if payload_root.exists():
-        shutil.rmtree(payload_root, ignore_errors=True)
-
-    stage_root = Path(context.build_dir) / "bison-stage"
-    if stage_root.exists():
-        shutil.rmtree(stage_root, ignore_errors=True)
-
-    cache_root = Path(context.build_dir) / CACHE_TARBALL_DIRNAME
-    if cache_root.exists():
-        shutil.rmtree(cache_root, ignore_errors=True)
+    pass
