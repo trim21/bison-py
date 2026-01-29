@@ -9,7 +9,7 @@ build-backend = "pdm.backend"
 [project]
 name = "bison-bin"
 description = "Prebuilt GNU Bison packaged as a Python wheel"
-version = "3.8.2.0"
+version = "3.8.2.1"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "Maintainers" }]
