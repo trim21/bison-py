@@ -13,7 +13,6 @@ from typing import Any
 import requests
 from pdm.backend.hooks import Context
 
-
 NAME = "bison"
 VERSION = "3.8.2"
 TARBALL_NAME = f"bison-{VERSION}.tar.xz"
