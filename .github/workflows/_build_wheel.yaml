@@ -80,7 +80,7 @@ jobs:
       # - run: uv tool install https://github.com/henryiii/cibuildwheel/archive/refs/heads/henryiii/feat/uvbuild.zip
 
       # - run: cibuildwheel sdist
-      - uses: pypa/cibuildwheel@v3.3.1
+      - uses: pypa/cibuildwheel@v3.4.1
         with:
           package-dir: sdist
         env:
