@@ -30,9 +30,9 @@ CONFIG_ARGS = [
 ]
 
 
-def _zig_target_for_arch(arch: str) -> "tuple[str, str] | tuple[None, None]":
-    print("[bison-bin]: getting targets for {!r}".format(arch), file=sys.stderr)
-    print("[bison-bin]: uname {!r}".format(platform.uname()), file=sys.stderr)
+def _zig_target_for_arch(arch: str) -> tuple[str, str] | tuple[None, None]:
+    print(f"[bison-bin]: getting targets for {arch!r}", file=sys.stderr)
+    print(f"[bison-bin]: uname {platform.uname()!r}", file=sys.stderr)
 
     if arch in {"x86_64", "amd64"}:
         return "x86_64-linux-musl", "x86_64"
@@ -58,7 +58,7 @@ ZIG_TARGET, PYPI_ARCH = _zig_target_for_arch(
 )
 
 
-def _default_linux_plat_name() -> "list[str] | None":
+def _default_linux_plat_name() -> list[str] | None:
     if not sys.platform.startswith("linux"):
         return None
 
@@ -81,7 +81,7 @@ def _default_linux_plat_name() -> "list[str] | None":
     return [x.format(PYPI_ARCH) for x in templates]
 
 
-def pdm_build_hook_enabled(context: "Context"):
+def pdm_build_hook_enabled(context: Context):
     return True
 
 
@@ -101,7 +101,7 @@ def pdm_build_initialize(context: Context) -> None:
     if context.target == "sdist":
         return
 
-    config_settings: "dict[str, Any]" = {
+    config_settings: dict[str, Any] = {
         "--python-tag": "py3",
         "--py-limited-api": "none",
         **context.builder.config_settings,
@@ -146,7 +146,7 @@ def build_tar(
     _run_cmd(["make", "install"], cwd=src_root, env=env)
 
 
-def _run_cmd(cmd: list[str], *, cwd: Path, env: "dict[str, str]") -> None:
+def _run_cmd(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> None:
     print("run: ", shlex.join(cmd))
     subprocess.check_call(cmd, cwd=cwd, env=env)
 
@@ -184,4 +184,4 @@ def _extract(archive: Path, target: Path) -> Path:
     if len(roots) == 1:
         return roots[0]
 
-    raise Exception("Multiple root directory in tar: {}".format(roots))
+    raise Exception(f"Multiple root directory in tar: {roots}")

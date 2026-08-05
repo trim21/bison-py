@@ -1,6 +1,6 @@
 from pathlib import Path
 
-__all__ = ["get_payload_root", "get_binary_path", "get_yacc_path"]
+__all__ = ["get_binary_path", "get_payload_root", "get_yacc_path"]
 
 
 def get_payload_root() -> Path:
