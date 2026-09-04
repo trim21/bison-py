@@ -1,10 +1,8 @@
 repos:
   - repo: https://github.com/trim21/dprint-pre-commit
-    rev: v0.49.1.2
+    rev: v0.57.0.0
     hooks:
       - id: dprint
-        pass_filenames: false
-        always_run: true
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: 0.26
@@ -40,12 +38,6 @@ repos:
         exclude: '.*\.bin'
       - id: fix-byte-order-marker
         exclude: '.*\.bin'
-
-  - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.8
-    hooks:
-      - id: clang-format
-        types_or: [c++, c, cuda]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
