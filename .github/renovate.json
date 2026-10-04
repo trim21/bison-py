@@ -5,6 +5,8 @@
     "local>trim21/renovate-config:python",
     "local>trim21/renovate-config:monthly"
   ],
+  "labels": ["ci:auto-merge", "dependencies"],
+  "rebaseWhen": "conflicted",
   "git-submodules": {
     "enabled": true
   },

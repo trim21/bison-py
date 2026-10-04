@@ -54,3 +54,9 @@ jobs:
 
       - run: yacc --help
       - run: which yacc
+
+  test-checks: # referenced in Mergify conditions -> name must be unique across ALL workflows in the repo
+    needs: [wheels, bin-check]
+    runs-on: ubuntu-slim # lightest runner - the job runs no payload, only an echo
+    steps:
+      - run: echo "all checks passed"
